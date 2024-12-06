@@ -13,6 +13,7 @@ import { CustomContextProvider } from "./context/CustomContext";
 import Navbar from "./components/layouts/navbar";
 import { Provider } from "react-redux";
 import store from "./store/store";
+import GlobalLoader from "./components/modals/globalLoader";
 
 const RootLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [queryClient] = useState(() => new QueryClient());
@@ -23,11 +24,16 @@ const RootLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <Provider store={store}>
           <CustomContextProvider>
             <QueryClientProvider client={queryClient}>
+              <GlobalLoader />
               {/* Navbar */}
               <Navbar />
 
               {/* Main Content */}
-              <main className="flex-1">{children}</main>
+              <main className="flex-1">
+                <div className="page-content">
+                  {children}
+                </div>
+              </main>
 
               <ReactQueryDevtools initialIsOpen={false} />
             </QueryClientProvider>
