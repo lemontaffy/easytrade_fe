@@ -14,6 +14,7 @@ import Navbar from "./components/layouts/navbar";
 import { Provider } from "react-redux";
 import store from "./store/store";
 import GlobalLoader from "./components/modals/globalLoader";
+import AuthInitializer from "./context/AuthInitializer";
 
 const RootLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [queryClient] = useState(() => new QueryClient());
@@ -24,6 +25,7 @@ const RootLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <Provider store={store}>
           <CustomContextProvider>
             <QueryClientProvider client={queryClient}>
+              <AuthInitializer>
               <GlobalLoader />
               {/* Navbar */}
               <Navbar />
@@ -36,6 +38,7 @@ const RootLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               </main>
 
               <ReactQueryDevtools initialIsOpen={false} />
+              </AuthInitializer>
             </QueryClientProvider>
           </CustomContextProvider>
         </Provider>

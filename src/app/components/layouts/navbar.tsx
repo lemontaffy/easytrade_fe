@@ -3,9 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUserCircle } from "@fortawesome/free-solid-svg-icons";
+import { faPowerOff, faUserCircle } from "@fortawesome/free-solid-svg-icons";
+import {  useSelector } from "react-redux";
+import { RootState } from "@/app/store/store";
+
 
 const Navbar: React.FC = () => {
+    const { isLoggedIn, profilePhoto } = useSelector((state: RootState) => state.settings.auth);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const toggleMenu = () => {
@@ -62,14 +66,32 @@ const Navbar: React.FC = () => {
                         <span>Detail Lists</span>
                     </Link>
 
-                    {/* My Page */}
-                    <Link
-                        href="/settings"
-                        className="hover:text-gray-300 flex items-center space-x-2 no-underline"
-                    >
-                        <FontAwesomeIcon icon={faUserCircle} className="text-base" fixedWidth />
-                        <span>My Page</span>
-                    </Link>
+                    {/* My Page or Login */}
+                    {isLoggedIn ? (
+                        <Link
+                            href="/settings"
+                            className="hover:text-gray-300 flex items-center space-x-2 no-underline"
+                        >
+                            {profilePhoto ? (
+                                <img
+                                    src={profilePhoto}
+                                    alt="Profile"
+                                    className="w-11 h-11 rounded-full border-2 border-gray-300 shadow"
+                                />
+                            ) : (
+                                <FontAwesomeIcon icon={faUserCircle} className="text-base" fixedWidth />
+                            )}
+                            <span>My Page</span>
+                        </Link>
+                    ) : (
+                        <Link
+                            href="/login"
+                            className="flex items-center px-4 py-2 bg-yellow-500 text-gray-900 rounded-lg shadow hover:bg-yellow-400 transition duration-300"
+                        >
+                            <FontAwesomeIcon icon="power-off" className="text-base" fixedWidth />
+                            <span className="ml-2">Login</span>
+                        </Link>
+                    )}
                 </nav>
             </div>
 
@@ -103,14 +125,32 @@ const Navbar: React.FC = () => {
                         <span>Detail Lists</span>
                     </Link>
 
-                    {/* My Page */}
-                    <Link
-                        href="/settings"
-                        className="block hover:text-gray-300 flex items-center space-x-2 no-underline"
-                    >
-                        <FontAwesomeIcon icon={faUserCircle} className="text-base" fixedWidth />
-                        <span>My Page</span>
-                    </Link>
+                      {/* My Page or Login */}
+                      {isLoggedIn ? (
+                        <Link
+                            href="/settings"
+                            className="block flex items-center space-x-2 no-underline hover:text-gray-300"
+                        >
+                            {profilePhoto ? (
+                                <img
+                                    src={profilePhoto}
+                                    alt="Profile"
+                                    className="w-8 h-8 rounded-full border-2 border-gray-300 shadow"
+                                />
+                            ) : (
+                                <FontAwesomeIcon icon={faUserCircle} className="text-base" fixedWidth />
+                            )}
+                            <span>My Page</span>
+                        </Link>
+                    ) : (
+                        <Link
+                            href="/login"
+                            className="block hover:text-gray-300 flex items-center space-x-1 no-underline"
+                        >
+                            <FontAwesomeIcon icon={faPowerOff} className="text-base" fixedWidth />
+                            <span>Login</span>
+                        </Link>
+                    )}
                 </nav>
             )}
         </header>

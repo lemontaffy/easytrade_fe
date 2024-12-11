@@ -62,7 +62,7 @@ class Requester {
             try {
               // Request a new Access Token using the Refresh Token
               const response = await axios.post(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/refresh`,
+                `${baseURL}/api/auth/refresh`,
                 { refreshToken }
               );
 

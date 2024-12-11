@@ -9,7 +9,7 @@ const store = configureStore({
   reducer: {
     infiniteScroll: infiniteScrollReducer,
     loading: loadingReducer,
-    setting: settingReducer,
+    settings: settingReducer,
   },
 });
 

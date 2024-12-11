@@ -1,5 +1,5 @@
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { faBars, faTimes, faHome, faShoppingCart, faBoxOpen, faCreditCard } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faTimes, faHome, faShoppingCart, faBoxOpen, faCreditCard, faPowerOff } from "@fortawesome/free-solid-svg-icons";
 
 // Add icons to the library for global use
-library.add(faBars, faTimes, faHome, faShoppingCart, faBoxOpen, faCreditCard);
+library.add(faBars, faTimes, faHome, faShoppingCart, faBoxOpen, faCreditCard, faPowerOff);

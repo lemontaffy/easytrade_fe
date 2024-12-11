@@ -34,6 +34,11 @@ const nextConfig: NextConfig = {
         source: "/api/:path*", // Proxy all requests starting with /api
         destination: "http://localhost:8081/api/:path*", // Redirect to the backend
       },
+       // Serve static files directly
+       {
+        source: '/uploads/:path*',
+        destination: 'http://localhost:8081/uploads/:path*', // Direct access to static files
+      },
     ];
   },
 };

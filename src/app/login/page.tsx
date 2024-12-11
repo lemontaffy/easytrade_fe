@@ -7,6 +7,7 @@ import requester from "../utils/requester";
 import { AppDispatch } from "../store/store";
 import { setLoading } from "../store/slices/loadingSlice";
 import { useDispatch } from "react-redux";
+import { loginAsync } from "../store/slices/settingsSlice";
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -14,24 +15,34 @@ const LoginPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const router = useRouter();
 
-  const handleLogin = async (): Promise<void> => {
-    dispatch(setLoading(true));
-    requester.post(`/api/auth/login`, { email, password }).then(response => {
-      console.log(response);
-      if (response.status === 200) {
-        dispatch(setLoading(false));
-        // Step 1: Store tokens in localStorage
-        localStorage.setItem('accessToken', response.data.accessToken);
-        localStorage.setItem('refreshToken', response.data.refreshToken);
+  // const handleLogin = async (): Promise<void> => {
+  //   dispatch(setLoading(true));
+  //   requester?.post(`/api/auth/login`, { email, password }).then(response => {
+  //     console.log(response);
+  //     if (response.status === 200) {
+  //       dispatch(setLoading(false));
+  //       // Step 1: Store tokens in localStorage
+  //       localStorage.setItem('accessToken', response.data.accessToken);
+  //       localStorage.setItem('refreshToken', response.data.refreshToken);
 
-        console.log("go to settings");
-        router.push("/settings");
-      } else {
-        dispatch(setLoading(false));
-        alert("Registration failed. Please try again.");
-      }
-    });
-  };
+  //       console.log("go to settings");
+  //       router.push("/settings");
+  //     } else {
+  //       dispatch(setLoading(false));
+  //       alert("Registration failed. Please try again.");
+  //     }
+  //   });
+  // };
+
+  const handleLogin = async () => {
+    try {
+        await dispatch(loginAsync({ email, password })).unwrap();
+        console.log("Login successful");
+        router.push('/settings');
+    } catch (error) {
+        console.error("Error during login:", error);
+    }
+};
 
   const handleGoogleLogin = (): void => {
     window.location.href = "/api/google-login";

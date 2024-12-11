@@ -4,8 +4,9 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 import requester from '../utils/requester';
+import SettingsPage from '../components/modals/SettingsPage';
 
-const SettingsPage: React.FC = () => {
+const Settings: React.FC = () => {
   const router = useRouter();
 
   const validateToken = (token: string): boolean => {
@@ -22,6 +23,7 @@ const SettingsPage: React.FC = () => {
   useEffect(() => {
     const checkAuth = async (): Promise<void> => {
       const accessToken = localStorage.getItem('accessToken');
+      console.log(accessToken);
 
       if (!accessToken || !validateToken(accessToken)) {
         console.warn("Access token is invalid or expired. Redirecting to /login...");
@@ -42,7 +44,11 @@ const SettingsPage: React.FC = () => {
     checkAuth();
   }, [router]);
 
-  return <h1>Settings Page</h1>;
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <SettingsPage />
+    </div>
+  );
 };
 
-export default SettingsPage;
+export default Settings;
