@@ -9,18 +9,26 @@ import { usePathname, useRouter } from "next/navigation";
 const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
-    const { isLoggedIn, profilePhoto } = useSelector((state: RootState) => state.settings.auth);
+    const { isLoggedIn } = useSelector((state: RootState) => state.settings.auth);
     const pathname = usePathname();
 
     useEffect(() => {
         const initializeAuth = async () => {
-            console.log(isLoggedIn, profilePhoto);
-            const token = localStorage.getItem("accessToken");
-            if (token) {
+            try {
+                const token = localStorage.getItem("accessToken");
+                const refreshToken = localStorage.getItem("refreshToken");
+
+                if (!token || !refreshToken) {
+                    console.warn("No token or refresh token found. Redirecting to login...");
+                    router.push("/login");
+                    return;
+                }
+
                 console.log("Initializing authentication...");
                 await dispatch(checkLoginAsync()).unwrap();
-            } else {
-                throw new Error("No token found");
+            } catch (error) {
+                console.error("Authentication failed:", error);
+                router.push("/login");
             }
         };
 

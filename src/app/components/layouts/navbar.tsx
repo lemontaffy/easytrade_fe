@@ -50,7 +50,7 @@ const Navbar: React.FC = () => {
 
                     {/* Make Purchase as a Yellow Button */}
                     <Link
-                        href="/make-purchase"
+                        href="/purchase"
                         className="flex items-center px-4 py-2 bg-yellow-500 text-gray-900 rounded-lg shadow hover:bg-yellow-400 transition duration-300"
                     >
                         <FontAwesomeIcon icon="shopping-cart" className="text-base" fixedWidth />
@@ -59,7 +59,7 @@ const Navbar: React.FC = () => {
 
                     {/* Detail Lists */}
                     <Link
-                        href="/detail-lists"
+                        href="/detail"
                         className="hover:text-gray-300 flex items-center space-x-1 no-underline"
                     >
                         <FontAwesomeIcon icon="credit-card" className="text-base" fixedWidth />
@@ -109,7 +109,7 @@ const Navbar: React.FC = () => {
 
                     {/* Make Purchase */}
                     <Link
-                        href="/make-purchase"
+                        href="/purchase"
                         className="block hover:text-gray-300 flex items-center space-x-1 no-underline"
                     >
                         <FontAwesomeIcon icon="shopping-cart" className="text-base" fixedWidth />
@@ -118,7 +118,7 @@ const Navbar: React.FC = () => {
 
                     {/* Detail Lists */}
                     <Link
-                        href="/detail-lists"
+                        href="/detail"
                         className="block hover:text-gray-300 flex items-center space-x-1 no-underline"
                     >
                         <FontAwesomeIcon icon="list" className="text-base" fixedWidth />

@@ -43,3 +43,20 @@ body {
 .page-content {
   margin-top: 60px; /* Add space below the navbar */
 }
+
+/* quiil */
+
+.ql-align-center img {
+  display: block;
+  margin: 0 auto;
+}
+
+.ql-align-left img {
+  display: inline-block;
+  margin: 0;
+}
+
+.ql-align-right img {
+  display: inline-block;
+  margin: 0 0 0 auto;
+}

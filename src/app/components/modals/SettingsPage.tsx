@@ -15,7 +15,7 @@ const SettingsPage: React.FC = () => {
 
   const [user, setUser] = useState({
     id: 0,
-    userName: "",
+    username: "",
     email: "",
     password: "",
     phoneNumber: "",
@@ -84,8 +84,8 @@ const SettingsPage: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
             <input
               type="text"
-              value={user.userName}
-              onChange={(e) => setUser({ ...user, userName: e.target.value })}
+              value={user.username}
+              onChange={(e) => setUser({ ...user, username: e.target.value })}
               className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -138,7 +138,7 @@ const SettingsPage: React.FC = () => {
               <div
                 key={profile.id}
                 className={`relative p-4 border rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl ${
-                  profile.isActive ? "border-green-500" : "border-gray-300"
+                  profile.active ? "border-green-500" : "border-gray-300"
                 }`}
               >
                 <img

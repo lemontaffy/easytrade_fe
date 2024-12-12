@@ -91,8 +91,8 @@ export const logoutAsync = createAsyncThunk("settings/logout", async (_, thunkAP
 export const checkLoginAsync = createAsyncThunk("settings/status", async (_, thunkAPI) => {
   try {
     // Perform status API call
-    const response = await requester!.post("/api/auth/status");
-    if (!response.data.loggedIn) {
+    const response = await requester!.get("/api/auth/status");
+    if (response.data) {
       return {
         isLoggedIn: response.data.loggedIn,
         profilePhoto: response.data.profilePhoto || null,
