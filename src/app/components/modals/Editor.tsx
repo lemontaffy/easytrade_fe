@@ -40,13 +40,14 @@ const Editor: React.FC<{ data: string }> = ({ data }) => {
     }, [data]);
 
     return (
-        <div>
+        <div className="h-[600px]">
             {ReactQuill && quillModules && (
                 <ReactQuill
-                    style={{ height: '500px' }}
+                    style={{ height: '95%', border: 'none' }}
                     value={editorData}
                     modules={quillModules}
                     onChange={(value) => setEditorData(value)}
+                    className="bg-white text-gray-800 placeholder-gray-400 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
             )}
         </div>

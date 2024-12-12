@@ -4,6 +4,8 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 interface AuthState {
   isLoggedIn: boolean;
   profilePhoto: string | null;
+  userId: number| null;
+  activeProfileId: number | null;
 }
 
 interface SettingsState {
@@ -24,6 +26,8 @@ const initialState: SettingsState = {
   auth: {
     isLoggedIn: false,
     profilePhoto: null,
+    userId: null,
+    activeProfileId: null,
   },
   profile: {
     name: "John Doe",
@@ -57,6 +61,8 @@ export const loginAsync = createAsyncThunk(
       return {
         isLoggedIn: statusData.loggedIn,
         profilePhoto: statusData.profilePhoto || null,
+        userId: statusData.userId || null,
+        activeProfileId: statusData.activeProfileId || null,
       };
     } catch (error: any) {
       console.error("LoginAsync error:", error);
@@ -77,6 +83,8 @@ export const logoutAsync = createAsyncThunk("settings/logout", async (_, thunkAP
       return {
         isLoggedIn: false,
         profilePhoto: null,
+        userId: null,
+        activeProfileId: null,
       };
     }
     throw new Error("Logout failed");
@@ -96,6 +104,8 @@ export const checkLoginAsync = createAsyncThunk("settings/status", async (_, thu
       return {
         isLoggedIn: response.data.loggedIn,
         profilePhoto: response.data.profilePhoto || null,
+        userId: response.data.userId || null,
+        activeProfileId: response.data.activeProfileId || null,
       };
     }
   } catch (error: any) {
@@ -160,10 +170,12 @@ const settingsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(loginAsync.fulfilled, (state, action: PayloadAction<{ isLoggedIn: boolean; profilePhoto: string }>) => {
+      .addCase(loginAsync.fulfilled, (state, action: PayloadAction<{ isLoggedIn: boolean; profilePhoto: string, userId: number, activeProfileId: number }>) => {
         state.loading = false;
         state.auth.isLoggedIn = action.payload.isLoggedIn;
         state.auth.profilePhoto = action.payload.profilePhoto;
+        state.auth.userId = action.payload.userId;
+        state.auth.activeProfileId = action.payload.activeProfileId;
       })
       .addCase(loginAsync.rejected, (state, action) => {
         state.loading = false;
@@ -175,10 +187,12 @@ const settingsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(logoutAsync.fulfilled, (state, action: PayloadAction<{ isLoggedIn: boolean; profilePhoto: string | null }>) => {
+      .addCase(logoutAsync.fulfilled, (state, action: PayloadAction<{ isLoggedIn: boolean; profilePhoto: string | null, userId: number | null, activeProfileId: number | null }>) => {
         state.loading = false;
         state.auth.isLoggedIn = action.payload.isLoggedIn;
         state.auth.profilePhoto = action.payload.profilePhoto;
+        state.auth.userId = action.payload.userId;
+        state.auth.activeProfileId = action.payload.activeProfileId;
       })
       .addCase(logoutAsync.rejected, (state, action) => {
         state.loading = false;
@@ -187,9 +201,11 @@ const settingsSlice = createSlice({
 
     // check status
     builder
-      .addCase(checkLoginAsync.fulfilled, (state, action: PayloadAction<{ isLoggedIn: boolean; profilePhoto: string | null }>) => {
+      .addCase(checkLoginAsync.fulfilled, (state, action: PayloadAction<{ isLoggedIn: boolean; profilePhoto: string | null, userId: number | null, activeProfileId: number | null }>) => {
         state.auth.isLoggedIn = action.payload.isLoggedIn;
         state.auth.profilePhoto = action.payload.profilePhoto;
+        state.auth.userId = action.payload.userId;
+        state.auth.activeProfileId = action.payload.activeProfileId;
       })
       .addCase(checkLoginAsync.rejected, (state, action) => {
         if (action.payload === "Unauthorized") {

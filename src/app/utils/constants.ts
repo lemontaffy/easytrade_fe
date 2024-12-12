@@ -43,6 +43,11 @@ export const DEFARULTTODATE =
   `0${1 + new Date().getMonth()}`.slice(-2) +
   `0${new Date().getDate()}`.slice(-2);
 
+export const TODATEWEEK =
+  new Date(+new Date() + 3600000 * 24 * 7).getFullYear() +
+  `0${1 + new Date(+new Date() + 3600000 * 24 * 7).getMonth()}`.slice(-2) +
+  `0${new Date(+new Date() + 3600000 * 24 * 7).getDate()}`.slice(-2);
+
 export const dateFormat = (source: any, delimiter = '-') => {
   const year = source.getFullYear();
   const month = leftPad(source.getMonth() + 1);

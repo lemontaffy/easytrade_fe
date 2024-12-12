@@ -5,27 +5,30 @@ import requester from "../utils/requester";
 import Editor from "../components/modals/Editor";
 import ThumbnailUpload from "../components/modals/Thumbnail";
 import DetailItem from "../components/modals/DetailItem";
+import PeriodPicker from "../components/modals/DatePeriodPicker";
+import { DEFARULTTODATE, formatDate, parseDate, TODATEWEEK } from "../utils/constants";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
 
 const CreateItemForm: React.FC = () => {
+  const { userId, activeProfileId } = useSelector((state: RootState) => state.settings.auth);
+
   const [mainItem, setMainItem] = useState({
-    userId: 1,
-    profileId: 1,
-    thumbnailUrl: "",
+    userId: userId,
+    profileId: activeProfileId,
+    thumbnailFile: null as File | null,
     title: "",
     tags: "",
-    salesStartDate: "",
-    salesEndDate: "",
+    salesStartDate: DEFARULTTODATE,
+    salesEndDate: TODATEWEEK,
     qrCode: "",
-    leftovers: 100,
     productBoard: "",
   });
 
-  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const [detailItems, setDetailItems] = useState([
     {
       detailName: "",
-      detailDescription: "",
-      detailImageUrl: "",
+      detailImageFile: null as File | null,
       price: "",
       leftovers: "",
       maxBuyCount: "",
@@ -40,10 +43,12 @@ const CreateItemForm: React.FC = () => {
   };
 
   const handleFileChange = (index: number, file: File) => {
+    const updatedDetails = [...detailItems];
+    updatedDetails[index].detailImageFile = file;
+
+    // Generate preview
     const reader = new FileReader();
     reader.onload = () => {
-      const updatedDetails = [...detailItems];
-      updatedDetails[index].detailImageUrl = file.name;
       updatedDetails[index].preview = reader.result as string;
       setDetailItems(updatedDetails);
     };
@@ -53,7 +58,7 @@ const CreateItemForm: React.FC = () => {
   const handleAddItem = () => {
     setDetailItems([
       ...detailItems,
-      { detailName: "", detailImageUrl: "", price: "", leftovers: "", maxBuyCount: "", preview: null },
+      { detailName: "", detailImageFile: null, price: "", leftovers: "", maxBuyCount: "", preview: null },
     ]);
   };
 
@@ -63,6 +68,10 @@ const CreateItemForm: React.FC = () => {
     setDetailItems(updatedDetails);
   };
 
+  const handleMainFileChange = (file: File) => {
+    setMainItem({ ...mainItem, thumbnailFile: file });
+  };
+
   const handleSubmit = async () => {
     if (mainItem.title.trim() === "" || detailItems.some((item) => item.detailName.trim() === "")) {
       alert("Please fill in all required fields.");
@@ -70,12 +79,42 @@ const CreateItemForm: React.FC = () => {
     }
 
     try {
-      const payload = {
-        item: mainItem,
-        detailItems,
-      };
+      const formData = new FormData();
 
-      const response = await requester!.post("/api/items", payload);
+      // Append main item details
+      const mainItemData = { ...mainItem };
+      delete mainItemData.thumbnailFile; // Remove file reference from JSON
+      formData.append("item", JSON.stringify(mainItemData));
+
+      if (mainItem.thumbnailFile) {
+        formData.append("thumbnail", mainItem.thumbnailFile);
+      }
+
+      // Check if detail items exist
+      if (detailItems.length === 0) {
+        throw new Error("Detail items are required.");
+      }
+
+      // Append detail items
+      detailItems.forEach((detail, index) => {
+        const detailData = { ...detail };
+        delete detailData.detailImageFile; // Remove file reference from JSON
+        formData.append(`detailItems`, JSON.stringify(detailData));
+
+        if (detail.detailImageFile) {
+          formData.append(`detailItemThumbnails`, detail.detailImageFile);
+        }
+      });
+
+      // Log the FormData
+      console.log("FormData Content:");
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
+
+      // Send the request
+      const response = await requester!.filePost("/api/items", formData);
+
       alert("Item created successfully!");
     } catch (error) {
       console.error("Error creating item:", error);
@@ -83,24 +122,33 @@ const CreateItemForm: React.FC = () => {
     }
   };
 
+
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Create New Item</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Create New Item</h2>
 
         {/* Main Item Section */}
         <div className="mb-8">
           <h3 className="text-xl font-semibold text-gray-700 mb-4">Main Item</h3>
-          <ThumbnailUpload />
-          <div className="grid grid-cols-1 gap-4">
-            <input
-              type="text"
-              placeholder="Title"
-              value={mainItem.title}
-              onChange={(e) => setMainItem({ ...mainItem, title: e.target.value })}
-              className="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 w-full"
-            />
-          </div>
+          <ThumbnailUpload onFileChange={handleMainFileChange} />
+          <input
+            type="text"
+            placeholder="Title"
+            value={mainItem.title}
+            onChange={(e) => setMainItem({ ...mainItem, title: e.target.value })}
+            className="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 w-full mt-4"
+          />
+        </div>
+
+        {/* Period Picker Section */}
+        <div className="w-full mb-8">
+          <PeriodPicker
+            startDate={parseDate(mainItem.salesStartDate)}
+            endDate={parseDate(mainItem.salesEndDate)}
+            onStartChange={(date) => setMainItem({ ...mainItem, salesStartDate: formatDate(date) })}
+            onEndChange={(date) => setMainItem({ ...mainItem, salesEndDate: formatDate(date) })}
+          />
         </div>
 
         {/* Detail Items Section */}
@@ -118,7 +166,7 @@ const CreateItemForm: React.FC = () => {
           ))}
           <button
             onClick={handleAddItem}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow-sm transition"
+            className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg shadow-sm transition w-full sm:w-auto"
           >
             + Add Detail Item
           </button>
@@ -127,16 +175,20 @@ const CreateItemForm: React.FC = () => {
         {/* Editor Section */}
         <div className="mb-8">
           <h3 className="text-xl font-semibold text-gray-700 mb-4">Product Board</h3>
-          <Editor data={mainItem.productBoard} />
+          <div className="overflow-hidden rounded-lg border border-gray-300">
+            <Editor data={mainItem.productBoard} />
+          </div>
         </div>
 
         {/* Submit Button */}
-        <button
-          onClick={handleSubmit}
-          className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg shadow-md transition"
-        >
-          Submit
-        </button>
+        <div className="flex justify-center mt-8">
+          <button
+            onClick={handleSubmit}
+            className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg shadow-md transition w-full sm:w-auto"
+          >
+            Submit
+          </button>
+        </div>
       </div>
     </div>
   );

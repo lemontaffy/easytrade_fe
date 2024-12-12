@@ -34,6 +34,7 @@ body {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -41,7 +42,8 @@ body {
 
 /* Assuming the navbar height is 60px */
 .page-content {
-  margin-top: 60px; /* Add space below the navbar */
+  margin-top: 60px;
+  /* Add space below the navbar */
 }
 
 /* quiil */
@@ -59,4 +61,42 @@ body {
 .ql-align-right img {
   display: inline-block;
   margin: 0 0 0 auto;
+}
+
+/* period picker */
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background-color: #FFD700 !important;
+  /* Yellow */
+  color: #000 !important;
+  /* Black text for contrast */
+}
+
+.react-datepicker__day--selected:hover {
+  background-color: #FFC700 !important;
+  /* Slightly darker yellow on hover */
+}
+
+.react-datepicker__day {
+  border-radius: 50%;
+  /* Optional: Makes the date circle rounded */
+}
+
+@layer base {
+  input {
+    @apply bg-white text-gray-800 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 placeholder-gray-400;
+  }
+
+  .ql-container {
+    @apply bg-white border border-gray-300 rounded-lg text-gray-800;
+  }
+
+  .ql-editor {
+    @apply text-gray-800 placeholder-gray-400;
+  }
+
+  .ql-container:focus-within {
+    @apply ring-2 ring-blue-500;
+  }
 }

@@ -105,16 +105,22 @@ class Requester {
   async request<T = any>(
     methodName: "get" | "post" | "put" | "delete",
     url: string,
-    params?: Record<string, any>,
+    params?: Record<string, any> | FormData,
+    type?: "file" | "json",
     headers?: Record<string, string>
   ): Promise<AxiosResponse<T>> {
     this.client.defaults.headers.common["SessionId"] = getSessionId() || "";
 
+    const isFile = type === "file";
+
+    // Adjust headers for file uploads
+    const adjustedHeaders = isFile ? undefined : { ...headers };
+
     const requestConfig: AxiosRequestConfig = {
       method: methodName,
       url,
-      headers,
-      data: methodName === "post" || methodName === "put" ? params : undefined,  // Request body
+      headers: adjustedHeaders,
+      data: methodName === "post" || methodName === "put" ? params : undefined, // Request body
       params: methodName === "get" || methodName === "delete" ? params : undefined, // Query parameters
       paramsSerializer: (parameters) => {
         return qs.stringify(parameters, { arrayFormat: "repeat" });
@@ -146,6 +152,11 @@ class Requester {
   delete<T = any>(url: string, params?: Record<string, any>): Promise<AxiosResponse<T>> {
     return this.request("delete", url, params);
   }
+
+  filePost<T = any>(url: string, formData: FormData): Promise<AxiosResponse<T>> {
+    return this.request("post", url, formData, "file");
+  }
+
 }
 
 export default typeof window !== "undefined" ? new Requester(axios) : null;
