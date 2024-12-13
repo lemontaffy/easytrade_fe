@@ -7,9 +7,19 @@ if (typeof window !== 'undefined' && Quill) {
     Quill.register('modules/ImageResize', ImageResize);
 }
 
-const Editor: React.FC<{ data: string }> = ({ data }) => {
+interface EditorProps {
+    data: string;
+    onChange: (value: string) => void;
+}
+
+const Editor: React.FC<EditorProps> = ({ data, onChange }) => {
     const [editorData, setEditorData] = useState<string>(data || '');
     const [quillModules, setQuillModules] = useState<any>(null);
+
+    const handleEditorChange = (value: string) => {
+        setEditorData(value);
+        onChange(value); // Notify the parent component
+    };
 
     useEffect(() => {
         if (!quillModules) {
@@ -38,6 +48,7 @@ const Editor: React.FC<{ data: string }> = ({ data }) => {
     useEffect(() => {
         setEditorData(data || '');
     }, [data]);
+    
 
     return (
         <div className="h-[600px]">
@@ -46,7 +57,7 @@ const Editor: React.FC<{ data: string }> = ({ data }) => {
                     style={{ height: '95%', border: 'none' }}
                     value={editorData}
                     modules={quillModules}
-                    onChange={(value) => setEditorData(value)}
+                    onChange={handleEditorChange}
                     className="bg-white text-gray-800 placeholder-gray-400 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
             )}

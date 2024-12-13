@@ -100,3 +100,6 @@ body {
     @apply ring-2 ring-blue-500;
   }
 }
+
+@import "~slick-carousel/slick/slick.css";
+@import "~slick-carousel/slick/slick-theme.css";

@@ -9,8 +9,13 @@ import PeriodPicker from "../components/modals/DatePeriodPicker";
 import { DEFARULTTODATE, formatDate, parseDate, TODATEWEEK } from "../utils/constants";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
+import DeliveryFeeInput from "../components/modals/DeliveryFee";
+import { useRouter } from "next/navigation";
 
 const CreateItemForm: React.FC = () => {
+
+  const router = useRouter();
+
   const { userId, activeProfileId } = useSelector((state: RootState) => state.settings.auth);
 
   const [mainItem, setMainItem] = useState({
@@ -22,6 +27,7 @@ const CreateItemForm: React.FC = () => {
     salesStartDate: DEFARULTTODATE,
     salesEndDate: TODATEWEEK,
     qrCode: "",
+    deliveryFee: "",
     productBoard: "",
   });
 
@@ -55,6 +61,13 @@ const CreateItemForm: React.FC = () => {
     reader.readAsDataURL(file);
   };
 
+  const handleEditorChange = (value: string) => {
+    setMainItem((prev) => ({
+      ...prev,
+      productBoard: value, // Update the productBoard field
+    }));
+  };
+
   const handleAddItem = () => {
     setDetailItems([
       ...detailItems,
@@ -73,54 +86,52 @@ const CreateItemForm: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    if (mainItem.title.trim() === "" || detailItems.some((item) => item.detailName.trim() === "")) {
-      alert("Please fill in all required fields.");
-      return;
-    }
-
     try {
       const formData = new FormData();
 
       // Append main item details
       const mainItemData = { ...mainItem };
-      delete mainItemData.thumbnailFile; // Remove file reference from JSON
+      delete mainItemData.thumbnailFile;
       formData.append("item", JSON.stringify(mainItemData));
 
       if (mainItem.thumbnailFile) {
         formData.append("thumbnail", mainItem.thumbnailFile);
       }
 
-      // Check if detail items exist
-      if (detailItems.length === 0) {
-        throw new Error("Detail items are required.");
-      }
-
-      // Append detail items
-      detailItems.forEach((detail, index) => {
+      // Combine detailItems into a single array and append
+      const detailItemsArray = detailItems.map((detail) => {
         const detailData = { ...detail };
         delete detailData.detailImageFile; // Remove file reference from JSON
-        formData.append(`detailItems`, JSON.stringify(detailData));
+        delete detailData.preview;
+        return detailData;
+      });
 
+      formData.append("detailItems", JSON.stringify(detailItemsArray));
+
+      // Append detailItemThumbnails separately
+      detailItems.forEach((detail) => {
         if (detail.detailImageFile) {
-          formData.append(`detailItemThumbnails`, detail.detailImageFile);
+          formData.append("detailItemThumbnails", detail.detailImageFile);
         }
       });
 
-      // Log the FormData
+      // Log the FormData for debugging
       console.log("FormData Content:");
       for (let [key, value] of formData.entries()) {
         console.log(`${key}:`, value);
       }
 
       // Send the request
-      const response = await requester!.filePost("/api/items", formData);
+      const response = await requester!.filePost("/api/items/register", formData);
 
       alert("Item created successfully!");
+      router.push('/');
     } catch (error) {
       console.error("Error creating item:", error);
       alert("Failed to create item.");
     }
   };
+
 
 
   return (
@@ -172,11 +183,16 @@ const CreateItemForm: React.FC = () => {
           </button>
         </div>
 
+        {/*Delivery Fees Section */}
+        <div className="mb-8">
+          <DeliveryFeeInput onUpdate={(fee) => setMainItem({ ...mainItem, deliveryFee: JSON.stringify(fee) })} />
+        </div>
+
         {/* Editor Section */}
         <div className="mb-8">
           <h3 className="text-xl font-semibold text-gray-700 mb-4">Product Board</h3>
           <div className="overflow-hidden rounded-lg border border-gray-300">
-            <Editor data={mainItem.productBoard} />
+            <Editor data={mainItem.productBoard} onChange={handleEditorChange} />
           </div>
         </div>
 

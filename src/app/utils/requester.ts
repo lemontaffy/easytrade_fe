@@ -28,7 +28,7 @@ class Requester {
       baseURL,
       withCredentials: true,
       headers: {
-        "Content-Type": "application/json",
+        // "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
       },
     });
@@ -40,6 +40,11 @@ class Requester {
 
         if (accessToken) {
           config.headers.Authorization = `Bearer ${accessToken}`;
+        }
+
+        // Avoid setting Content-Type globally here
+        if (config.data instanceof FormData) {
+          delete config.headers['Content-Type']; // Let Axios handle it
         }
 
         return config;
@@ -114,7 +119,7 @@ class Requester {
     const isFile = type === "file";
 
     // Adjust headers for file uploads
-    const adjustedHeaders = isFile ? undefined : { ...headers };
+    const adjustedHeaders = isFile ? undefined : { "Content-Type": "application/json", ...headers };
 
     const requestConfig: AxiosRequestConfig = {
       method: methodName,
