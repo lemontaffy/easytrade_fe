@@ -1,4 +1,4 @@
-import requester from "@utils/requester";
+import requester from "@/utils/requester";
 import React, { useEffect, useState } from "react";
 
 interface Item {

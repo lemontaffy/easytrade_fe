@@ -1,9 +1,8 @@
 'use client';
 
+import requester from "@/utils/requester";
 import React, { useEffect, useState } from "react";
 import LinkSSOSection from "./LinkSSOSection";
-import requester from "@utils/requester";
-import axios from "axios";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store/store";
 import { logoutAsync } from "@/store/slices/settingsSlice";
@@ -27,23 +26,19 @@ const SettingsPage: React.FC = () => {
   const [activeProfileId, setActiveProfileId] = useState<number | null>(null);
 
   const fetchUserProfile = async () => {
+    if (!requester) {
+      console.warn("Requester is not available (server-side).");
+      return;
+    }
+  
     try {
-      const accessToken = localStorage.getItem("accessToken");
-
-      const response = await axios.get(`/api/user`, {
-        baseURL: process.env.NEXT_APP_API_ENDPOINT_PROD || "http://localhost:3000",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: accessToken ? `Bearer ${accessToken}` : "",
-        },
-        withCredentials: true,
-      });
-
+      const response = await requester.get("/api/user");
+  
       console.log("User profile fetched successfully:", response.data);
       setUser(response.data.user);
       setProfiles(response.data.profiles);
-    } catch (error) {
-      console.error("Error fetching user profile:", error.response || error.message);
+    } catch (error: any) {
+      console.error("Error fetching user profile:", error?.response || error.message);
     }
   };
 

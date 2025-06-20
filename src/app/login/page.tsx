@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from 'next/navigation';
-import { AxiosResponse } from "axios";
 import requester from "../utils/requester";
 import { AppDispatch } from "../store/store";
 import { setLoading } from "../store/slices/loadingSlice";
