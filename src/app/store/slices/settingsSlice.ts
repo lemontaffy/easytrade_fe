@@ -1,6 +1,8 @@
 import requester from "@/utils/requester";
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 
+import { setLoading } from "./loadingSlice";
+
 interface AuthState {
   isLoggedIn: boolean;
   profilePhoto: string | null;
@@ -20,6 +22,8 @@ interface SettingsState {
   };
   loading: boolean;
   error: string | null;
+  user: null;
+  profiles: [];
 }
 
 const initialState: SettingsState = {
@@ -39,14 +43,25 @@ const initialState: SettingsState = {
   },
   loading: false,
   error: null,
+  user: null,
+  profiles: [],
 };
 
 //Async thunk for login
 export const loginAsync = createAsyncThunk(
   "settings/login",
-  async (credentials: { email: string; password: string }, thunkAPI) => {
+  async (
+    credentials: { email: string; password: string },
+    thunkAPI
+  ): Promise<{
+    isLoggedIn: boolean;
+    profilePhoto: string | null;
+    userId: string | null;
+    activeProfileId: string | null;
+  }> => {
     try {
-      // Execute the login API call
+      thunkAPI.dispatch(setLoading(true));
+
       const loginResponse = await requester!.post(
         "/api/auth/login",
         credentials
@@ -56,22 +71,22 @@ export const loginAsync = createAsyncThunk(
         localStorage.setItem("refreshToken", loginResponse.data.refreshToken);
       }
 
-      // Fetch the authentication status
       const statusResponse = await requester!.get("/api/auth/status");
       const statusData = statusResponse.data;
 
-      // Return the fetched authentication state
       return {
         isLoggedIn: statusData.loggedIn,
         profilePhoto: statusData.profilePhoto || null,
         userId: statusData.userId || null,
         activeProfileId: statusData.activeProfileId || null,
       };
-    } catch (error: any) {
-      console.error("LoginAsync error:", error);
+    } catch (err) {
+      console.error("LoginAsync error:", err);
       return thunkAPI.rejectWithValue(
         "Failed to login and fetch authentication status"
       );
+    } finally {
+      thunkAPI.dispatch(setLoading(false));
     }
   }
 );
@@ -136,36 +151,45 @@ export const checkLoginAsync = createAsyncThunk(
 // Async thunk for updating profile
 export const updateProfileAsync = createAsyncThunk(
   "settings/updateProfile",
-  async (profile: { name: string; email: string }) => {
-    const response = await fetch("/api/settings/profile", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(profile),
-    });
-    if (!response.ok) {
-      throw new Error("Failed to update profile");
+  async (profile: { name: string; email: string }, thunkAPI) => {
+    try {
+      const response = await requester!.post("/api/settings/profile", profile);
+      return response.data; // 실제 응답 데이터 반환
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+      return thunkAPI.rejectWithValue("Failed to update profile");
     }
-    return profile; // Return the updated profile if the API call succeeds
   }
 );
 
 // Async thunk for updating preferences
 export const updatePreferencesAsync = createAsyncThunk(
   "settings/updatePreferences",
-  async (preferences: { theme: string; notifications: boolean }) => {
-    const response = await fetch("/api/settings/preferences", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(preferences),
-    });
-    if (!response.ok) {
-      throw new Error("Failed to update preferences");
+  async (preferences: { theme: string; notifications: boolean }, thunkAPI) => {
+    try {
+      const response = await requester!.post(
+        "/api/settings/preferences",
+        preferences
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to update preferences:", error);
+      return thunkAPI.rejectWithValue("Failed to update preferences");
     }
-    return preferences; // Return the updated preferences if the API call succeeds
+  }
+);
+
+export const fetchUserProfileAsync = createAsyncThunk(
+  "user/fetchProfile",
+  async (_, thunkAPI) => {
+    try {
+      const response = await requester!.get("/api/user");
+      return response.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(
+        error?.response?.data || "Failed to fetch user"
+      );
+    }
   }
 );
 
@@ -298,6 +322,20 @@ const settingsSlice = createSlice({
       .addCase(updatePreferencesAsync.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || "Failed to update preferences";
+      });
+    builder
+      .addCase(fetchUserProfileAsync.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUserProfileAsync.fulfilled, (state, action) => {
+        state.user = action.payload.user;
+        state.profiles = action.payload.profiles;
+        state.loading = false;
+      })
+      .addCase(fetchUserProfileAsync.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       });
   },
 });

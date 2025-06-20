@@ -3,9 +3,9 @@
 import requester from "@/utils/requester";
 import React, { useEffect, useState } from "react";
 import LinkSSOSection from "./LinkSSOSection";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/store/store";
-import { logoutAsync } from "@/store/slices/settingsSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
+import { fetchUserProfileAsync, logoutAsync } from "@/store/slices/settingsSlice";
 import { useRouter } from "next/navigation";
 
 const SettingsPage: React.FC = () => {
@@ -20,54 +20,33 @@ const SettingsPage: React.FC = () => {
     phoneNumber: "",
     address: "",
   });
+
   const [profiles, setProfiles] = useState<
     { id: number; nickname: string; photoUrl: string; active: boolean }[]
   >([]);
+  
   const [activeProfileId, setActiveProfileId] = useState<number | null>(null);
-
-  const fetchUserProfile = async () => {
-    if (!requester) {
-      console.warn("Requester is not available (server-side).");
-      return;
-    }
-  
-    try {
-      const response = await requester.get("/api/user");
-  
-      console.log("User profile fetched successfully:", response.data);
-      setUser(response.data.user);
-      setProfiles(response.data.profiles);
-    } catch (error: any) {
-      console.error("Error fetching user profile:", error?.response || error.message);
-    }
-  };
 
   const handleLogout = async () => {
     await dispatch(logoutAsync()).unwrap();
     router.push("/");
   };
 
-  const handleSaveChanges = async (field: string, value: string) => {
-    try {
-      const response = await fetch(`/api/update-profile`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ [field]: value }),
-      });
+const reduxUser = useSelector((state: RootState) => state.settings.user);
+const reduxProfiles = useSelector((state: RootState) => state.settings.profiles);
 
-      if (response.ok) {
-        alert(`${field} updated successfully!`);
-      } else {
-        alert(`Failed to update ${field}.`);
-      }
-    } catch (error) {
-      console.error(`Error updating ${field}:`, error);
-    }
-  };
+useEffect(() => {
+  dispatch(fetchUserProfileAsync());
+}, [dispatch]);
 
-  useEffect(() => {
-    fetchUserProfile();
-  }, []);
+useEffect(() => {
+  if (reduxUser) {
+    setUser(reduxUser);
+  }
+  if (reduxProfiles) {
+    setProfiles(reduxProfiles);
+  }
+}, [reduxUser, reduxProfiles]);
 
   return (
     <div className="bg-gray-100 min-h-screen flex items-center justify-center">

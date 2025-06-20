@@ -8,6 +8,7 @@ import { Provider } from "react-redux";
 
 import { CustomContextProvider } from "@/context/CustomContext";
 import store from "@/store/store";
+import GlobalLoader from "../modals/globalLoader";
 
 export const AppProviders = ({ children }: { children: ReactNode }) => {
   const [queryClient] = useState(() => new QueryClient());
@@ -16,6 +17,7 @@ export const AppProviders = ({ children }: { children: ReactNode }) => {
     <Provider store={store}>
       <CustomContextProvider>
         <QueryClientProvider client={queryClient}>
+          <GlobalLoader/>
           {children}
           <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>

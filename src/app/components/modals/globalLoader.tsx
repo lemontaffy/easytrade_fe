@@ -1,5 +1,5 @@
+import { RootState } from "@/store/store";
 import { useSelector } from "react-redux";
-import { RootState } from "@/app/store/store";
 
 const GlobalLoader: React.FC = () => {
   const isLoading = useSelector((state: RootState) => state.loading.isLoading);
