@@ -2,11 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import LinkSSOSection from "./LinkSSOSection";
-import requester from "@/app/utils/requester";
+import requester from "@utils/requester";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/app/store/store";
-import { logoutAsync } from "@/app/store/slices/settingsSlice";
+import { AppDispatch } from "@/store/store";
+import { logoutAsync } from "@/store/slices/settingsSlice";
 import { useRouter } from "next/navigation";
 
 const SettingsPage: React.FC = () => {
