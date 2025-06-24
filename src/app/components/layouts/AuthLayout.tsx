@@ -1,6 +1,3 @@
-// components/layouts/AuthLayout.tsx
-'use client';
-
 import { ReactNode } from "react";
 
 import GlobalLoader from "@/components/modals/globalLoader";
