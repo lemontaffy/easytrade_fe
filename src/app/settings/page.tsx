@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
-import requester from '../utils/requester';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
 import SettingsPage from '../components/modals/SettingsPage';
+import requester from '../utils/requester';
 
 const Settings: React.FC = () => {
   const router = useRouter();

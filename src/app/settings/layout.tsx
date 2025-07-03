@@ -1,15 +1,12 @@
-// app/purchase/layout.tsx
-'use client';
-
 import { AuthLayout } from "@/components/layouts/AuthLayout";
 import MainLayout from "@/components/layouts/MainLayout";
 import { ReactNode } from "react";
 
-export default function PurchaseLayout({ children }: { children: ReactNode }) {
+export default function SettingsLayout({ children }: { children: ReactNode }) {
   return (
     <MainLayout>
-      <AuthLayout>
-        {children}
+        <AuthLayout>
+      {children}
       </AuthLayout>
     </MainLayout>
   );

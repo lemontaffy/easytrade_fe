@@ -1,4 +1,5 @@
 import requester from "@/utils/requester";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
 interface Item {
@@ -20,6 +21,7 @@ const RegisteredItems: React.FC<RegisteredItemsProps> = ({ items }) => {
       <h1 className="text-2xl font-semibold text-gray-800 mb-6">Registered Items</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {items.map((item: Item) => (
+          <Link key={item.id} href={`/items/${item.id}`}>
           <div
             key={item.id}
             className="bg-white rounded-lg shadow-md overflow-hidden border"
@@ -37,6 +39,7 @@ const RegisteredItems: React.FC<RegisteredItemsProps> = ({ items }) => {
               </div>
             </div>
           </div>
+          </Link>
         ))}
       </div>
     </div>

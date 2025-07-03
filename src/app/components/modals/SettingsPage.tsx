@@ -116,7 +116,7 @@ useEffect(() => {
                 }`}
               >
                 <img
-                  src={profile.photoUrl}
+                  src={`${process.env.NEXT_PUBLIC_API_ENDPOINT_LOCAL}/${profile.photoUrl}`}
                   alt={profile.nickname}
                   className="w-16 h-16 rounded-full mx-auto"
                 />

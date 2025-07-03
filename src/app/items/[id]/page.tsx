@@ -11,6 +11,7 @@ interface DetailItem {
   leftovers: string;
   maxBuyCount: string;
   preview?: string;
+  detailImageUrl: string;
 }
 
 interface MainItem {
@@ -32,6 +33,7 @@ export default function ItemDetailPage() {
     const fetchItemDetail = async () => {
       try {
         const res = await requester?.get(`/api/items/${id}`);
+        console.log(res);
         const data = res?.data;
 
         setMainItem(data.item);
@@ -55,7 +57,7 @@ export default function ItemDetailPage() {
       {/* Thumbnail */}
       <div className="mb-6">
         <img
-          src={mainItem.thumbnailUrl}
+          src={`${process.env.NEXT_PUBLIC_API_ENDPOINT_LOCAL}/${mainItem.thumbnailUrl}`}
           alt="Thumbnail"
           className="w-full max-h-64 object-cover rounded-lg"
         />
@@ -66,9 +68,15 @@ export default function ItemDetailPage() {
         판매기간: {mainItem.salesStartDate} ~ {mainItem.salesEndDate}
       </p>
 
-      {/* Delivery Fee */}
       <p className="text-gray-600 mb-4">
-        배송비: {JSON.parse(mainItem.deliveryFee || "0")}원
+        배송비:
+        {Array.isArray(mainItem.deliveryFee)
+          ? mainItem.deliveryFee.map((fee, i) => (
+            <span key={i}>
+              {fee.method} {fee.fee.toLocaleString()}원{i < mainItem.deliveryFee.length - 1 ? ', ' : ''}
+            </span>
+          ))
+          : "0원"}
       </p>
 
       {/* Product Board (HTML) */}
@@ -82,9 +90,9 @@ export default function ItemDetailPage() {
       <div className="grid gap-4">
         {detailItems.map((item, idx) => (
           <div key={idx} className="border rounded p-4 shadow-sm">
-            {item.preview && (
+            {item.detailImageUrl && (
               <img
-                src={item.preview}
+                src={`${process.env.NEXT_PUBLIC_API_ENDPOINT_LOCAL}/${item.detailImageUrl}`}
                 alt="detail"
                 className="h-40 w-full object-cover mb-2 rounded"
               />

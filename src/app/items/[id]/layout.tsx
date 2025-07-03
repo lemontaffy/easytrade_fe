@@ -1,7 +1,7 @@
 import MainLayout from "@/components/layouts/MainLayout";
 import { ReactNode } from "react";
 
-export default function HomeLayout({ children }: { children: ReactNode }) {
+export default function ItemsLayout({ children }: { children: ReactNode }) {
   return (
     <MainLayout>
       {children}
